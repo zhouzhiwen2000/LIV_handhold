@@ -9,6 +9,8 @@
 * **`27 May 2024`:** Fix a bug in the calculation of the synthetic GPRMC timestamp, which could cause timestamp rollback. Additionally, we add checksum verification for GPRMC.
 * **`20 May 2024`:** According to Livox Avia's pin requirements, we convert PPS TTL level to RS485 level and supplement it with more detailed electronic connection and material list.
 
+📬 For further assistance or inquiries, please feel free to contact Chunran Zheng at zhengcr@connect.hku.hk.
+
 ## 1. Introduction
 This repository provides the **CAD files** (with suffix “\*.SLDPRT and \*.SLDASM”) for our handheld device, which can be opened and edited with [*Solidworks*](https://www.solidworks.com). All of the modules are suitable for printing with [*FDM (Fused Deposition Modeling)*](https://en.wikipedia.org/wiki/Fused_filament_fabrication). In addition, we have also open-sourced our **hardware synchronization scheme**, as well as the **STM32 source code** and **hardware wiring configuration** instructions.
 
@@ -204,12 +206,12 @@ The guide for the electronic connections is presented as follows:
   </tr>
 </table>
 
-**🔴🔥 IMPORTANT:**
+**🔥 IMPORTANT:**
 * **STM32 PB5 (PPS signal) is converted from TTL to RS-485, resulting in RS485_Output A+ and RS485_Output B-;**
 * **STM32 TXD (GPRMC) is converted from TTL to USB and sent to the PC;** 
 * **If you are using the Mid360, you can directly connect STM32 PB5 to LiDAR M12 pps interface;**
 * **Before you `roslaunch livox_ros_driver livox_lidar_msg.launch`, you can use `sudo chmod a+rw /dev/ttyUSB0` grant permissions to the USB serial port;**
-* **The default connection method in this repository directly connects to M12 without using the Livox converter. If you use the converter, you can connect STM32 PB5 (PPS signal) to the Livox converter Sync Port without converting TTL to 485 level. Refer to [Issue 19](https://github.com/sheng00125/LIV_handhold/issues/19) for details.**
+* **The default connection method in this repository directly connects to M12 without using the Livox converter. If you use the converter, you can connect STM32 PB5 (PPS signal) to the Livox converter Sync Port without converting TTL to 485 level. Refer to [Issue 19](https://github.com/xuankuzcr/LIV_handhold/issues/19) for details.**
 
 ## 4. How to run the driver
 ```bash
