@@ -1,18 +1,19 @@
 # [LiDAR_Inertial_Visual_Handhold](https://zhuanlan.zhihu.com/p/670136001)
 
 ### News
-* **`27 October 2024`:** Add modified livox_ros_driver2 with time sync support for Mid360.
-* **`11 October 2024`:** Add support for other pixel formats besides RGB8 (e.g., BayerRG8, BayerRG12Packed).
-* **`03 October 2024`:** Add ARM support, fix the camera driver startup and shutdown bug, remove the SerialNumber dependency, resolve the auto-exposure mode switching issue, and add a TriggerEnable interface to allow testing the camera without the PPS signal.
-* **`15 July 2024`:** Fix the bug related to LiDAR (IMU) timestamp compensation in the `livox_ros_driver`, remove the dynamic library dependency from `mvs_ros_driver`, and enable this synchronization scheme to use the official `livox_sdk`.
-* **`28 June 2024`:** Update reproduction videos and some important notes.
-* **`27 May 2024`:** Fix a bug in the calculation of the synthetic GPRMC timestamp, which could cause timestamp rollback. Additionally, we add checksum verification for GPRMC.
-* **`20 May 2024`:** According to Livox Avia's pin requirements, we convert PPS TTL level to RS485 level and supplement it with more detailed electronic connection and material list.
+* **Mar. 24, 2025** - Open-sourced the UAV platform with hard-sync LIV sensors used in [FAST-LIVO2](https://github.com/hku-mars/FAST-LIVO2). 🎉
+* **Oct. 27, 2024** - Add modified livox_ros_driver2 with time sync support for Mid360.
+* **Oct. 11, 2024** - Add support for other pixel formats besides RGB8 (e.g., BayerRG8, BayerRG12Packed).
+* **Oct. 03, 2024** - Add ARM support, fix the camera driver startup and shutdown bug, remove the SerialNumber dependency, resolve the auto-exposure mode switching issue, and add a TriggerEnable interface to allow testing the camera without the PPS signal.
+* **Jul. 15, 2024** - Fix the bug related to LiDAR (IMU) timestamp compensation in the `livox_ros_driver`, remove the dynamic library dependency from `mvs_ros_driver`, and enable this synchronization scheme to use the official `livox_sdk`.
+* **Jun. 28, 2024** - Update reproduction videos and some important notes.
+* **May. 27, 2024** - Fix a bug in the calculation of the synthetic GPRMC timestamp, which could cause timestamp rollback. Additionally, we add checksum verification for GPRMC.
+* **May. 20, 2024** - According to Livox Avia's pin requirements, we convert PPS TTL level to RS485 level and supplement it with more detailed electronic connection and material list.
 
 📬 For further assistance or inquiries, please feel free to contact Chunran Zheng at zhengcr@connect.hku.hk.
 
 ## 1. Introduction
-This repository provides the **CAD files** (with suffix “\*.SLDPRT and \*.SLDASM”) for our handheld device, which can be opened and edited with [*Solidworks*](https://www.solidworks.com). All of the modules are suitable for printing with [*FDM (Fused Deposition Modeling)*](https://en.wikipedia.org/wiki/Fused_filament_fabrication). In addition, we have also open-sourced our **hardware synchronization scheme**, as well as the **STM32 source code** and **hardware wiring configuration** instructions.
+This repository provides the **CAD files** (with suffix “\*.SLDPRT and \*.SLDASM”) for **our handheld and uav-mounted devices**, which can be opened and edited with [*Solidworks*](https://www.solidworks.com). All of the modules are suitable for printing with [*FDM (Fused Deposition Modeling)*](https://en.wikipedia.org/wiki/Fused_filament_fabrication). In addition, we have also open-sourced our **hardware synchronization scheme**, as well as the **STM32 source code** and **hardware wiring configuration** instructions.
 
 <div align="center">
 <img src="./pics/cover.jpg"  width="100.0%" />
@@ -35,7 +36,9 @@ Thanks to the Bilibili uploader [GundaSmart](https://space.bilibili.com/68763914
 ## 3. Guide to installation
 ### 3.1 Root directory
 
-    ├── handhold_cad/ - CAD source files
+    ├── handhold_cad/ - CAD source files for Handheld device
+    │   ├── ...
+    ├── drone_cad/ - CAD source files for UAV device
     │   ├── ...
     ├── livox_ros_driver/ - Livox LiDAR ROS driver
     │   ├── ...
@@ -220,7 +223,7 @@ roslaunch livox_ros_driver livox_lidar_msg.launch
 rosbag record /livox/lidar /livox/imu left_camera/image
 ```
 
-## 5. Main material lists (only for reference)
+## 5. Bill of materials (only for reference)
 | Item  | Pics  | Purchasing list  |
 | :------------: | :------------: | :------------: |
 | Livox Avia LiDAR  | <img src="./pics/livox_avia.png" width=20%  /> | [Livox Avia](https://store.dji.com/hk-en/product/livox-avia) |
@@ -232,7 +235,14 @@ rosbag record /livox/lidar /livox/imu left_camera/image
 | TTL to USB | <img src="./pics/usb.jpg" width=30%  /> | [TTL to USB](https://m.tb.cn/h.gWzMxzBSkhSqkH3?tk=N1j3WEzIP9u) |
 | TTL to 485 | <img src="./pics/485.jpg" width=30%  /> | [TTL to 485](https://m.tb.cn/h.g3SEkso?tk=eER4WEzFYmP) |
 
-## 6. License
+## 6. Alternative UAV Platform 
+
+For detailed equipment drawings, refer to the [drone_cad](https://github.com/xuankuzcr/LIV_handhold/tree/main/drone_cad) folder.
+<div align="center">
+<img src="./pics/uav.jpg"  width="100.0%" />
+</div>
+
+## 7. License
 The source code is released under [GPLv3](http://www.gnu.org/licenses/) license. 
 
 If you use any code of this repo in your academic research, it will be **very appreciated** if you can cite any of our following papers:
