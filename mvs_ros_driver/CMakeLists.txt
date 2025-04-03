@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(mvs_ros_pkg)
+project(mvs_ros_driver)
 set(cv_bridge_DIR /usr/local/share/cv_bridge/cmake) 
 
 add_compile_options(-std=c++14)
@@ -29,7 +29,7 @@ catkin_package(
 )
 
 include_directories(
-  include
+  /opt/MVS/include
   ${catkin_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
   ${PCL_INCLUDE_DIRS}
@@ -45,6 +45,5 @@ target_link_libraries(
   grabImgWithTrigger
   ${catkin_LIBRARIES}
   ${OpenCV_LIBS}
-  -lMvCameraControl
-  -lpthread
+  MvCameraControl
 )

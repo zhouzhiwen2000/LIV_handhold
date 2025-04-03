@@ -40,6 +40,37 @@ std::string GainAutoStr[3] = {"Off", "Once", "Continues"};
 float image_scale = 0.0;
 int trigger_enable = 1;
 
+
+bool PrintDeviceInfo(MV_CC_DEVICE_INFO* pstMVDevInfo)
+{
+  if (NULL == pstMVDevInfo)
+  {
+    printf("The Pointer of pstMVDevInfo is NULL!\n");
+    return false;
+  }
+  if (pstMVDevInfo->nTLayerType == MV_GIGE_DEVICE)
+  {
+    int nIp1 = ((pstMVDevInfo->SpecialInfo.stGigEInfo.nCurrentIp & 0xff000000) >> 24);
+    int nIp2 = ((pstMVDevInfo->SpecialInfo.stGigEInfo.nCurrentIp & 0x00ff0000) >> 16);
+    int nIp3 = ((pstMVDevInfo->SpecialInfo.stGigEInfo.nCurrentIp & 0x0000ff00) >> 8);
+    int nIp4 = (pstMVDevInfo->SpecialInfo.stGigEInfo.nCurrentIp & 0x000000ff);
+
+    printf("Device Model Name: %s\n", pstMVDevInfo->SpecialInfo.stGigEInfo.chModelName);
+    printf("CurrentIp: %d.%d.%d.%d\n", nIp1, nIp2, nIp3, nIp4);
+    printf("SerialNumber: %s\n", pstMVDevInfo->SpecialInfo.stGigEInfo.chSerialNumber);
+  }
+  else if (pstMVDevInfo->nTLayerType == MV_USB_DEVICE)
+  {
+    printf("Device Model Name: %s\n", pstMVDevInfo->SpecialInfo.stUsb3VInfo.chModelName);
+    printf("SerialNumber: %s\n", pstMVDevInfo->SpecialInfo.stUsb3VInfo.chSerialNumber);
+  }
+  else
+  {
+    printf("Not support.\n");
+  }
+  return true;
+}
+
 void setParams(void *handle, const std::string &params_file) {
   cv::FileStorage Params(params_file, cv::FileStorage::READ);
   if (!Params.isOpened()) {
@@ -172,8 +203,9 @@ static void *WorkThread(void *pUser) {
 
   MV_FRAME_OUT_INFO_EX stImageInfo = {0};
   MV_CC_PIXEL_CONVERT_PARAM stConvertParam = {0};
+  
   unsigned char* pData = (unsigned char *)malloc(sizeof(unsigned char) * stParam.nCurValue);
-  unsigned char* pDataForBGR = (unsigned char*)malloc(sizeof(unsigned char) * stParam.nCurValue * 3);
+  unsigned char* pDataForBGR = (unsigned char*)malloc(sizeof(unsigned char) * stParam.nCurValue);
 
   if (pData == nullptr || pDataForBGR == nullptr) {
     printf("Memory allocation failed!\n");
@@ -213,7 +245,7 @@ static void *WorkThread(void *pUser) {
       stConvertParam.enSrcPixelType = stImageInfo.enPixelType;
       stConvertParam.enDstPixelType = PixelType_Gvsp_RGB8_Packed;
       stConvertParam.pDstBuffer = pDataForBGR;
-      stConvertParam.nDstBufferSize = stImageInfo.nWidth * stImageInfo.nHeight * 3;
+      stConvertParam.nDstBufferSize = stParam.nCurValue;
       nRet = MV_CC_ConvertPixelType(pUser, &stConvertParam);
       if (MV_OK != nRet)
       {
@@ -288,40 +320,102 @@ int main(int argc, char **argv) {
 
   nRet = MV_CC_EnumDevices(MV_GIGE_DEVICE | MV_USB_DEVICE, &stDeviceList);
   if (MV_OK != nRet) {
-    printf("Enum Devices fail!");
+    printf("MV_CC_EnumDevices fail! nRet [%x]\n", nRet);
     return -1;
   }
 
-  if (stDeviceList.nDeviceNum == 0) {
-    ROS_ERROR_STREAM("No Camera.\n");
-    return -1;
-  } 
-  else 
+  if (stDeviceList.nDeviceNum > 0)
   {
+    for (int i = 0; i < stDeviceList.nDeviceNum; i++)
+    {
+      printf("[device %d]:\n", i);
+      MV_CC_DEVICE_INFO* pDeviceInfo = stDeviceList.pDeviceInfo[i];
+      if (pDeviceInfo == NULL)
+      {
+        printf("Device info is NULL for device %d\n", i);
+        return -1;
+      } 
+      PrintDeviceInfo(pDeviceInfo);            
+    }  
+  } 
+  else
+  {
+    printf("Find No Devices!\n");
+    return -1;
+  }
+
+  bool find_expect_camera = false;
+  unsigned int nIndex = 0;
+
+  if (stDeviceList.nDeviceNum > 1) 
+  {
+    if (expect_serial_number.empty()) 
+    {
+      ROS_ERROR("Expected serial number is empty!");
+      return -1;
+    }
     for (int i = 0; i < stDeviceList.nDeviceNum; i++) 
     {
-      nRet = MV_CC_CreateHandle(&handle, stDeviceList.pDeviceInfo[i]);
-      if (MV_OK != nRet) 
+      if (stDeviceList.pDeviceInfo[i] == NULL) 
       {
-        ROS_ERROR_STREAM("Failed to create handle for device " << i << "Error code: " << nRet);
-        continue; // Continue trying other devices if available
+        printf("Device info is NULL for device %d\n", i);
+        continue;
       }
-      else 
+      
+      std::string serial_number;
+      if (stDeviceList.pDeviceInfo[i]->nTLayerType == MV_USB_DEVICE)
       {
-        ROS_INFO_STREAM("Successfully created handle for device " << i);
-        break; // Exit the loop after successfully creating a handle
+        serial_number = 
+            std::string((char *)stDeviceList.pDeviceInfo[i]->SpecialInfo.stUsb3VInfo.chSerialNumber);
+      }
+      else if (stDeviceList.pDeviceInfo[i]->nTLayerType == MV_GIGE_DEVICE)
+      {
+        serial_number = 
+            std::string((char *)stDeviceList.pDeviceInfo[i]->SpecialInfo.stGigEInfo.chSerialNumber);
+      }
+      else
+      {
+        printf("Unknown device type!\n");
+        continue;
+      }
+      if (serial_number.empty()) 
+      {
+        printf("Serial number is empty for device %d\n", i);
+        continue;
+      }
+      if (expect_serial_number == serial_number) 
+      {
+        find_expect_camera = true;
+        nIndex = i;
+        break;
       }
     }
-    if (MV_OK != nRet) 
+    if (!find_expect_camera) 
     {
-      ROS_ERROR_STREAM("Failed to create handle for any device.");
-      return -1; // Ensure function exits if no handle could be created
+      std::string msg =
+          "Can not find the camera with serial number " + expect_serial_number;
+      ROS_ERROR_STREAM(msg.c_str());
+      return -1;
     }
   }
+  else
+  {
+    nIndex = 0;
+  }
+  
+  // select device and create handle
+  nRet = MV_CC_CreateHandle(&handle, stDeviceList.pDeviceInfo[nIndex]);
+  if (MV_OK != nRet)
+  {
+    printf("MV_CC_CreateHandle fail! nRet [%x]\n", nRet);
+    return -1;
+  }
 
+  // open device
   nRet = MV_CC_OpenDevice(handle);
-  if (MV_OK != nRet) {
-    printf("Open Device fail\n");
+  if (MV_OK != nRet)
+  {
+    printf("MV_CC_OpenDevice fail! nRet [%x]\n", nRet);
     return -1;
   }
 

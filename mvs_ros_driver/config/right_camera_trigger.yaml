@@ -3,8 +3,8 @@
 #--------------------------------------------------------------------------------------------
 # Camera Parameters. Adjust them!
 #--------------------------------------------------------------------------------------------
-# SerialNumber: "00G66398256"
-TopicName: "left_camera/image"
+SerialNumber: "K34130194" # Not needed for single camera. Specify serial number for multiple cameras. 
+TopicName: "right_camera/image"
 
 TriggerEnable: 1 # 0 stands for Off, 1 stands for On
 

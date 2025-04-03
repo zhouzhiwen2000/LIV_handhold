@@ -1,10 +1,11 @@
 # [LiDAR_Inertial_Visual_Handhold](https://zhuanlan.zhihu.com/p/670136001)
 
 ### News
+* **Apr. 04, 2025** - Add support for multiple cameras.
 * **Mar. 24, 2025** - Open-sourced the UAV platform with hard-sync LIV sensors used in [FAST-LIVO2](https://github.com/hku-mars/FAST-LIVO2). 🎉
-* **Oct. 27, 2024** - Add modified livox_ros_driver2 with time sync support for Mid360.
+* **Oct. 27, 2024** - Add modified `livox_ros_driver2` with time sync support for Mid360.
 * **Oct. 11, 2024** - Add support for other pixel formats besides RGB8 (e.g., BayerRG8, BayerRG12Packed).
-* **Oct. 03, 2024** - Add ARM support, fix the camera driver startup and shutdown bug, remove the SerialNumber dependency, resolve the auto-exposure mode switching issue, and add a TriggerEnable interface to allow testing the camera without the PPS signal.
+* **Oct. 03, 2024** - Add ARM support, fix `mvs_ros_driver` startup and shutdown bug, remove the SerialNumber dependency, resolve the auto-exposure mode switching issue, and add a TriggerEnable interface to allow testing the camera without the PPS signal.
 * **Jul. 15, 2024** - Fix the bug related to LiDAR (IMU) timestamp compensation in the `livox_ros_driver`, remove the dynamic library dependency from `mvs_ros_driver`, and enable this synchronization scheme to use the official `livox_sdk`.
 * **Jun. 28, 2024** - Update reproduction videos and some important notes.
 * **May. 27, 2024** - Fix a bug in the calculation of the synthetic GPRMC timestamp, which could cause timestamp rollback. Additionally, we add checksum verification for GPRMC.
@@ -42,7 +43,7 @@ Thanks to the Bilibili uploader [GundaSmart](https://space.bilibili.com/68763914
     │   ├── ...
     ├── livox_ros_driver/ - Livox LiDAR ROS driver
     │   ├── ...
-    ├── mvs_ros_pkg/ - Camera driver
+    ├── mvs_ros_driver/ - Camera driver
     │   ├── ...
     └── stm32_timersync-open/ - Embedded engineering folder
     │   ├── USER/ - Main functionality folder
@@ -218,7 +219,7 @@ The guide for the electronic connections is presented as follows:
 
 ## 4. How to run the driver
 ```bash
-roslaunch mvs_ros_pkg mvs_camera_trigger.launch
+roslaunch mvs_ros_driver mvs_camera_trigger.launch
 roslaunch livox_ros_driver livox_lidar_msg.launch
 rosbag record /livox/lidar /livox/imu left_camera/image
 ```
