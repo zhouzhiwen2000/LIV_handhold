@@ -26,14 +26,15 @@ enum PixelFormat : unsigned int {
   RGB8 = 0x02180014,
   BayerRG8 = 0x01080009,
   BayerRG12Packed = 0x010C002B,
-  BayerGB12Packed = 0x010C002C
+  BayerGB12Packed = 0x010C002C,
+  BayerGB8 = 0x0108000A
 };
 // unsigned int g_nPayloadSize = 0;
 bool is_undistorted = true;
 bool exit_flag = false;
 int width, height;
 image_transport::Publisher pub;
-std::vector<PixelFormat> PIXEL_FORMAT = { RGB8, BayerRG8, BayerRG12Packed, BayerGB12Packed};
+std::vector<PixelFormat> PIXEL_FORMAT = { RGB8, BayerRG8, BayerRG12Packed, BayerGB12Packed, BayerGB8 };
 std::string ExposureAutoStr[3] = {"Off", "Once", "Continues"};
 std::string GammaSlectorStr[3] = {"User", "sRGB", "Off"};
 std::string GainAutoStr[3] = {"Off", "Once", "Continues"};
@@ -204,8 +205,8 @@ static void *WorkThread(void *pUser) {
   MV_FRAME_OUT_INFO_EX stImageInfo = {0};
   MV_CC_PIXEL_CONVERT_PARAM stConvertParam = {0};
   
-  unsigned char* pData = (unsigned char *)malloc(sizeof(unsigned char) * stParam.nCurValue);
-  unsigned char* pDataForBGR = (unsigned char*)malloc(sizeof(unsigned char) * stParam.nCurValue);
+  unsigned char* pData = (unsigned char *)malloc(sizeof(unsigned char) * stParam.nCurValue * 3);
+  unsigned char* pDataForBGR = (unsigned char*)malloc(sizeof(unsigned char) * stParam.nCurValue * 3);
 
   if (pData == nullptr || pDataForBGR == nullptr) {
     printf("Memory allocation failed!\n");
@@ -216,7 +217,7 @@ static void *WorkThread(void *pUser) {
 
   while (!exit_flag && ros::ok()) {
 
-    nRet = MV_CC_GetOneFrameTimeout(pUser, pData, stParam.nCurValue, &stImageInfo, 1000);
+    nRet = MV_CC_GetOneFrameTimeout(pUser, pData, stParam.nCurValue * 3, &stImageInfo, 1000);
     if (nRet == MV_OK) {
       
       ros::Time rcv_time;
@@ -241,11 +242,11 @@ static void *WorkThread(void *pUser) {
       stConvertParam.nWidth = stImageInfo.nWidth;
       stConvertParam.nHeight = stImageInfo.nHeight;
       stConvertParam.pSrcData = pData;
-      stConvertParam.nSrcDataLen = stParam.nCurValue; 
+      stConvertParam.nSrcDataLen = stParam.nCurValue * 3; 
       stConvertParam.enSrcPixelType = stImageInfo.enPixelType;
       stConvertParam.enDstPixelType = PixelType_Gvsp_RGB8_Packed;
       stConvertParam.pDstBuffer = pDataForBGR;
-      stConvertParam.nDstBufferSize = stParam.nCurValue;
+      stConvertParam.nDstBufferSize = stParam.nCurValue * 3;
       nRet = MV_CC_ConvertPixelType(pUser, &stConvertParam);
       if (MV_OK != nRet)
       {
@@ -432,7 +433,7 @@ int main(int argc, char **argv) {
   //   printf("Get PayloadSize fail\n");
   //   return -1;
   // }
-  // g_nPayloadSize = stParam.nCurValue;
+  // g_nPayloadSize = stParam.nCurValue * 3;
 
   nRet = MV_CC_SetEnumValue(handle, "PixelFormat", PIXEL_FORMAT[PixelFormat]); // BayerRG8 0x01080009 RGB8 0x02180014 BayerRG12Packed 0x010C002B
   if (nRet != MV_OK) {

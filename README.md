@@ -218,9 +218,19 @@ The guide for the electronic connections is presented as follows:
 * **The default connection method in this repository directly connects to M12 without using the Livox converter. If you use the converter, you can connect STM32 PB5 (PPS signal) to the Livox converter Sync Port without converting TTL to 485 level. Refer to [Issue 19](https://github.com/xuankuzcr/LIV_handhold/issues/19) for details.**
 
 ## 4. How to run the driver
+### 4.1 Prerequisites
+Download and install [MVS-2.1.2](https://connecthkuhk-my.sharepoint.com/:u:/g/personal/zhengcr_connect_hku_hk/Ed0Xq17d6udNqYn4vkR71bQBFz0z6_Kru3cz1gD95FIgrQ?e=FPvfkT) and [Livox-SDK](https://github.com/Livox-SDK/Livox-SDK).
+### 4.2 Execution Steps
+1. Launch the MVS camera driver with trigger mode:
 ```bash
-roslaunch mvs_ros_driver mvs_camera_trigger.launch
+roslaunch mvs_ros_driver mvs_camera_trigger.launch 
+```
+2. Start the Livox LiDAR driver:
+```bash
 roslaunch livox_ros_driver livox_lidar_msg.launch
+```
+3. Record sensor data:
+```bash
 rosbag record /livox/lidar /livox/imu left_camera/image
 ```
 
