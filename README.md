@@ -74,7 +74,7 @@ The guide for the electronic connections is presented as follows:
     <td>Power: +</td>
     <td rowspan="8" align="center">
       <img src="./pics/12PIN.jpg" alt="Diagram" width="38%"><br>
-      <span style="display: block; text-align: center;">AVIA 12-Pin Interface, top: female bottom: male</span>
+      <span style="display: block; text-align: center;">AVIA 12-Pin Interface, top: male bottom: female</span>
     </td>
   </tr>
   <tr>
