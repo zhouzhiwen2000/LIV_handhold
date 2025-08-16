@@ -1,23 +1,23 @@
-#include "led.h"
+ï»¿#include "led.h"
 #include "delay.h"
 #include "key.h"
 #include "sys.h"
 #include "usart.h"
 #include "timer.h"
-//»ÒÉ« SWIO  7 ×ó4
-//°×É« SWCLK 9 ×ó5
-//ºÚÉ« GND ÓÒ 2
+//ç°è‰² SWIO  7 å·¦4
+//ç™½è‰² SWCLK 9 å·¦5
+//é»‘è‰² GND å³ 2
 
 
 extern vu16 var_Exp;
 int main(void)
 {
 
-	delay_init();	    	 //ÑÓÊ±º¯Êı³õÊ¼»¯	  
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2); 	 //ÉèÖÃNVICÖĞ¶Ï·Ö×é2:2Î»ÇÀÕ¼ÓÅÏÈ¼¶£¬2Î»ÏìÓ¦ÓÅÏÈ¼¶
-	//uart_init(115200);	 //´®¿Ú³õÊ¼»¯Îª115200
+	delay_init();	    	 //å»¶æ—¶å‡½æ•°åˆå§‹åŒ–	  
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2); 	 //è®¾ç½®NVICä¸­æ–­åˆ†ç»„2:2ä½æŠ¢å ä¼˜å…ˆçº§ï¼Œ2ä½å“åº”ä¼˜å…ˆçº§
+	//uart_init(115200);	 //ä¸²å£åˆå§‹åŒ–ä¸º115200
 	uart_init(9600);
- 	LED_Init();			     //LED¶Ë¿Ú³õÊ¼»¯
+ 	LED_Init();			     //LEDç«¯å£åˆå§‹åŒ–
 	//1000 ms 50 
 	TIM2_PWM_Init(999,7199); // 10 Hz    pin_A1       
 

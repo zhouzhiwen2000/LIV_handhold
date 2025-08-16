@@ -1,4 +1,4 @@
-/* FastCRC library code is placed under the MIT license
+﻿/* FastCRC library code is placed under the MIT license
  * Copyright (c) 2014,2015 Frank Bosing
  *
  * Permission is hereby granted, free of charge, to any person obtaining
